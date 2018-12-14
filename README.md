@@ -1,8 +1,8 @@
-### mc_usage
+# mc_usage
 ## Start mc_usage.pl server on several hosts on a same network
-# Need ssh equivalence (In ~/.ssh directory private key, authorized_keys and known_hosts must be correctly configured)
+## Need ssh equivalence (In ~/.ssh directory private key, authorized_keys and known_hosts must be correctly configured)
 
-* multicast info on host usage  
+### multicast info on host usage  
 `./mc_usage.pl <server|shutdown|listhost|client|execute> [<degree of parallelism> <commands file or commands>]`  
 	Execute commands on a list of hosts who send their usage to a multicast group.  
 	Server : Multicast usage (%cpu, %vsz) to a multicast group.  
@@ -32,7 +32,7 @@
 		When execute: 4th parameter is the max number of child (degree of parallelism)  
 		When execute: 5th parameter is a file of commands or a list of commands to run  
 
-* Exemple:
+### Exemple:
 ./mc_usage.pl server  
 ./mc_usage.pl shutdown  
 ./mc_usage.pl client  
