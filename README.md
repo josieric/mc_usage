@@ -1,6 +1,6 @@
 ## mc_usage
 * multicast info on host usage  
-./mc_usage.pl <server|shutdown|listhost|client|execute> `[<degree of parallelism> <commands file or commands>]`  
+`./mc_usage.pl <server|shutdown|listhost|client|execute> [<degree of parallelism> <commands file or commands>]`  
 	Execute commands on a list of hosts who send their usage to a multicast group.  
 	Server : Multicast usage (%cpu, %vsz) to a multicast group.  
 	Clients: Choose a target host to execute commands (via ssh).  
@@ -14,17 +14,17 @@
 		export MCEXECSLEEP=<sleep time for wait child in ModeExecute> (default:1)  
 		export ONE_MULTICAST=1 (default:0) use in ModeExecute to single request to MCGROUP:PORT  
 				so host is elected by roundrobin  
--	Command: server  
+-	Command server:  
 		start the multicast server to send usage info (log to mc_server.log)  
--	Command: shutdown  
+-	Command shutdown:  
 		shutdown the multicast server if it is on the same host  
--	Command: shutdownall  
+-	Command shutdownall:  
 		shutdown the multicast server on all hosts (kill via ssh)  
--	Command: lishost  
+-	Command lishost:  
 		read multicast to find a list of ALL host in this MCGROUP:MCPORT  
--	Command: client  
+-	Command client:  
 		read multicast to find host with lower usage  
--	Command: execute  
+-	Command execute:  
 		execute commands on lower usage host (log to mc_execute.log)  
 		When execute: 4th parameter is the max number of child (degree of parallelism)  
 		When execute: 5th parameter is a file of commands or a list of commands to run  
