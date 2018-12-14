@@ -1,6 +1,6 @@
 ## mc_usage
 * multicast info on host usage  
-./mc_usage.pl <server|shutdown|listhost|client|execute> [ <degree of parallelism> <commands file or commands> ]  
+./mc_usage.pl <server|shutdown|listhost|client|execute> \[<degree of parallelism> <commands file or commands>\]  
 	Execute commands on a list of hosts who send their usage to a multicast group.  
 	Server : Multicast usage (%cpu, %vsz) to a multicast group.  
 	Clients: Choose a target host to execute commands (via ssh).  
