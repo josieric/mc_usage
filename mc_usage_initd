@@ -1,0 +1,26 @@
+#! /bin/bash
+#
+# use this script to start deamon
+# copy to /etc/init.d
+# and configure your system to use during boot
+#
+# Modify entry below with your environment :
+[ "$MIHOME" == "" ] && MIHOME=/home/eric/codetest/multicast
+[ -x $MIHOME/mc_server_env.sh ] && . $MIHOME/mc_server_env.sh
+case "$1" in
+    start)
+        # log is create in current directory
+        cd $MIHOME
+        # start mc_usage Server default parameter ou env variables from mc_server_env.sh if exists
+        $MIHOME/mc_usage.pl server
+        ;;
+    stop)
+        # stop local mc_usage Server
+        $MIHOME/mc_usage.pl shutdown
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+
