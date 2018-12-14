@@ -1,4 +1,7 @@
-## mc_usage
+### mc_usage
+## Start mc_usage.pl server on several hosts on a same network
+# Need ssh equivalence (In ~/.ssh directory private key, authorized_keys and known_hosts must be correctly configured)
+
 * multicast info on host usage  
 `./mc_usage.pl <server|shutdown|listhost|client|execute> [<degree of parallelism> <commands file or commands>]`  
 	Execute commands on a list of hosts who send their usage to a multicast group.  

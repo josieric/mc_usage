@@ -5,7 +5,7 @@
 # and configure your system to use during boot
 #
 # Modify entry below with your environment :
-[ "$MIHOME" == "" ] && MIHOME=/home/eric/codetest/multicast
+[ "$MIHOME" == "" ] && MIHOME=/home/eric/codetest/mc_usage
 [ -x $MIHOME/mc_server_env.sh ] && . $MIHOME/mc_server_env.sh
 case "$1" in
     start)
