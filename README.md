@@ -1,6 +1,14 @@
 # mc_usage
-## Start mc_usage.pl server on several hosts on a same network
-## Need ssh equivalence (In ~/.ssh directory private key, authorized_keys and known_hosts must be correctly configured)
+ Start mc_usage.pl server on several hosts on a same network
+ Need ssh equivalence (In ~/.ssh directory private key, authorized_keys and known_hosts must be correctly configured)
+### Install
+apt-get -y install libio-socket-multicast-perl  
+yum install perl-IO-Socket-Multicast  
+cp /opt/mc_usage/mc_usage.service /lib/systemd/system/  
+ln -s /lib/systemd/system/mc_usage.service /etc/systemd/system/.  
+systemctl daemon-reload  
+systemctl enable mc_usage  
+systemctl restart mc_usage  
 
 ### multicast info on host usage  
 `./mc_usage.pl <server|shutdown|listhost|client|execute> [<degree of parallelism> <commands file or commands>]`  
