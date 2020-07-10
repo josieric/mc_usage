@@ -13,7 +13,7 @@ use IO::Interface::Simple;
 use constant EXEC_SSH => 'ssh -o PubkeyAuthentication=yes -o BatchMode=yes -o StrictHostKeyChecking=no ';
 use constant DFGROUP => '239.11.11.11'; ## group multicast par default 
 use constant DFPORT => '45688';         ## port multicast par default
-use constant MCSERVERSLEEP => '5'; ## Temps en seconde de latence lors des attentes du server multicast
+use constant MCSERVERSLEEP => '2'; ## Temps en seconde de latence lors des attentes du server multicast
 use constant MCEXECSLEEP => '1'; ## Temps en seconde de latence lors des attentes des fils en mode Execute (Wait_All & Wait_One)
 use constant LOGDIR => '.';
 
@@ -46,6 +46,13 @@ if ($type eq "server") {
 elsif ($type =~ /^shutdown/ ) {
   ## Mode client/shutdown
   mc_client($GROUP,$PORT,$type);
+}
+elsif($type eq "listip") {
+  ## Mode listip
+  foreach(mc_listip($GROUP,$PORT,$type)) {
+    my ($h,$p,$ip) = split('/',$_);
+    print $ip."\n";
+  }
 }
 elsif($type eq "listhost") {
   ## Mode client/listhost
@@ -111,7 +118,9 @@ sub Usage {
   print "\t\tshutdown the multicast server if it is on the same host\n";
   print "\tCommand: shutdownall\n";
   print "\t\tshutdown the multicast server on all hosts (kill via ssh)\n";
-  print "\tCommand: lishost\n";
+  print "\tCommand: listip\n";
+  print "\t\tread multicast to find a list of ALL ip in this MCGROUP:MCPORT (send just list of ip on STDOUT)\n";
+  print "\tCommand: listhost\n";
   print "\t\tread multicast to find a list of ALL host in this MCGROUP:MCPORT\n";
   print "\tCommand: client\n";
   print "\t\tread multicast to find host with lower usage\n";
@@ -131,6 +140,68 @@ sub Usage {
 #################
 ## Functions multicast
 #######################
+sub mc_listip {
+  my $GROUP = shift;
+  my $PORT  = shift;
+  my $action = shift;
+  my $logname = shift;
+  my $time_in=time();
+  my $sock = IO::Socket::Multicast->new(Proto=>'udp',LocalPort=>$PORT);
+  while ( ! $sock ) {
+     Log($logname, format_dt(time)." Error opening localport $PORT : $!\n");
+     Log($logname, "\tRetry in $server_sleep_time s\n");
+     sleep $server_sleep_time;
+     $sock = IO::Socket::Multicast->new(Proto=>'udp',LocalPort=>$PORT);
+  }
+  $sock->mcast_ttl(1);
+  $sock->mcast_add($GROUP) || die "Couldn't set group: $!\n";
+  binmode $sock;
+  my $flags;
+  fcntl($sock, F_GETFL, $flags) || die $!; # Get the current flags on the filehandle
+  fcntl($sock, F_SETFL, $flags | O_NONBLOCK) || die $!; # Set the flags on the filehandle
+
+  my $timeout=$server_sleep_time + 2; # Et pourquoi pas 2 !!
+  my $time = time();
+  my $choix = {};
+  while (1) {
+     my $data;
+      unless ($sock->recv($data,512) )  {
+       sleep 1;
+       if (time() - $time > $timeout) {
+         die "Nobody speak since $timeout s.\n";
+         #last;
+       }
+       next;
+     }
+     $time = time();
+     my ($ip1,$ip2,$ip3,$ip4,$recv_time,$cpu_usage,$mem_usage,$pid,$host) = unpack('C4lffIa*',$data);
+     $host = $host."/".$pid;
+     if (! defined $choix->{$host} ) {
+       $choix->{$host}->{CPU} = $cpu_usage;
+       $choix->{$host}->{MEM} = $mem_usage;
+       $choix->{$host}->{IP} = "$ip1.$ip2.$ip3.$ip4";
+     }
+     else {
+       last;
+     }
+  }
+  $sock->mcast_drop($GROUP) || die "Couldn't unset group: $!\n";
+  $sock->close()  || die "Couldn't stop socket: $!\n";
+    # Tri par la charge CPU
+    my @list = sort { $choix->{$a}->{CPU} <=> $choix->{$b}->{CPU} } keys %{$choix};
+    my $host_elected = $list[0];
+    if ( $choix->{$host_elected}->{CPU} > 50) {
+      # Tri par charge memoire
+      @list = sort { $choix->{$a}->{MEM} <=> $choix->{$b}->{MEM} } keys %{$choix};
+      $host_elected = $list[0];
+    }
+    my $elapse = time() - $time_in;
+    foreach(@list) {
+       $_ .=  "/".$choix->{$_}->{IP};
+    }
+    return @list ;
+}
+
 sub mc_client {
   my $GROUP = shift;
   my $PORT  = shift;
@@ -455,4 +526,5 @@ sub Wait_One {
     $reste=$#nbfils-$#tmp;    # On calcul si le reste de fils par rapport au début de fonction
   }
 }
+
 

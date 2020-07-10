@@ -1,0 +1,11 @@
+[Unit]
+Description=multicast usage
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=forking
+ExecStart=/opt/mc_usage/mc_usage.pl server
+ExecStop=/opt/mc_usage/mc_usage.pl shutdown
+
+

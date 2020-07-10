@@ -7,7 +7,6 @@ yum install perl-IO-Socket-Multicast
 cp /opt/mc_usage/mc_usage.service /lib/systemd/system/  
 ln -s /lib/systemd/system/mc_usage.service /etc/systemd/system/.  
 systemctl daemon-reload  
-systemctl enable mc_usage  
 systemctl restart mc_usage  
 
 ### multicast info on host usage  
